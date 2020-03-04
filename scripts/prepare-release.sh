@@ -63,4 +63,9 @@ git checkout release
 git merge master
 git commit -a --allow-empty -m "merge develop for PlayStore release"
 git push
+git checkout master
 
+echo "********************************************************"
+echo "****** Done Upgraded from $version to $newVersion ******"
+echo "******       Merged Master to Releaes Build       ******"
+echo "********************************************************"
