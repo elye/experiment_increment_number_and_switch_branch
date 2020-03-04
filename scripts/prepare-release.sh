@@ -14,7 +14,6 @@ fi
 echo "...Now pulling latest change on master branch.. wait..."
 git pull
 
-
 if [ -z "$(git status --porcelain)" ]; then 
   	echo "Ok: Your master is clean"
 else 
@@ -23,14 +22,11 @@ else
 	exit 1
 fi
 
-if ! git diff-index --quiet HEAD --; then
-    echo "Change************"
-    exit 1
-else
-    echo "No Change************"
-    exit 1
+if [ ! -z "$(git status -sb | grep ahead)"]; then
+	echo "Error: Your local master is ahead of remote"
+	echo "       Please sync with remote master"
+	exit 1
 fi
-
 
 if [ ! -f ./version ]; then
     echo "Version file not found!"
