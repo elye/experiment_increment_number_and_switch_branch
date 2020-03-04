@@ -40,7 +40,15 @@ echo "...Fetching latest update..."
 git fetch
 
 git checkout -b $temporaryBranch
-git branch -D $sourceBranch
+
+if [ -z `git rev-parse --verify --quiet $sourceBranch` ]; then
+	git branch -D $sourceBranch
+fi
+
+if [ ! -z `git rev-parse --verify --quiet $sourceBranch` ]; then
+	git branch -D $targetBranch
+fi
+
 git branch -D $targetBranch
 git checkout $sourceBranch
 
