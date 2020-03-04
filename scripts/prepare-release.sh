@@ -7,7 +7,7 @@ temporaryBranch="temporaryBranchForReleaseProcess"
 
 echo "**********************************************************"
 echo "****** This is to start Android relese process "
-echo "****** Warning: Your $sourceBranch and $targetBranch will be rsync"
+echo "****** Warning: Your $sourceBranch and $targetBranch will be resync"
 echo "****** Make sure you don't have a different commit on them"
 echo "**********************************************************"
 echo ""
@@ -20,8 +20,12 @@ else
 	exit 1
 fi
 
-currentBranchName=`git rev-parse --abbrev-ref HEAD`
+if [ ! -z `git rev-parse --verify --quiet $temporaryBranch` ]; then
+	echo "Ops, you have $temporaryBranch. Please remove it"
+	exit 1
+fi
 
+currentBranchName=`git rev-parse --abbrev-ref HEAD`
 
 if [ -z "$(git status --porcelain)" ]; then 
   	echo "Ok: Your $currentBranchName is commited"
@@ -35,6 +39,7 @@ fi
 echo "...Fetching latest update..."
 git fetch
 
+git branch -D $temporaryBranch
 git checkout -b $temporaryBranch
 git branch -D $sourceBranch
 git branch -D $targetBranch
