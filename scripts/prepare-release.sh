@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export MEME=0
+
 branchName=`git rev-parse --abbrev-ref HEAD`
 if [ "$branchName" != "master" ]
 then
@@ -48,4 +50,17 @@ echo "new version is $newVersion"
 echo $newVersion > $versionFileName
 echo "written new version to version file"
 
+git add -A .
+
+echo "Committing changes"
+git commit -m "auto: bump app version"
+git push origin
+
+echo "Merge master to release"
+export GIT_MERGE_AUTOEDIT=no
+
+git checkout release
+git merge master
+git commit -a --allow-empty -m "merge develop for PlayStore release"
+git push
 
