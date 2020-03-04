@@ -49,7 +49,6 @@ if [ ! -z `git rev-parse --verify --quiet $targetBranch` ]; then
 	git branch -D $targetBranch
 fi
 
-git branch -D $targetBranch
 git checkout $sourceBranch
 
 if [ ! -f ./version ]; then
