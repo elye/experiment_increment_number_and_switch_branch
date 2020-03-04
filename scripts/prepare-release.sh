@@ -45,7 +45,7 @@ if [ -z `git rev-parse --verify --quiet $sourceBranch` ]; then
 	git branch -D $sourceBranch
 fi
 
-if [ ! -z `git rev-parse --verify --quiet $sourceBranch` ]; then
+if [ ! -z `git rev-parse --verify --quiet $targetBranch` ]; then
 	git branch -D $targetBranch
 fi
 
