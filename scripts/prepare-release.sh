@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+sourceBranch="master"
+targetBranch="release"
+
 read -p "Ready for Android release process (YES/NO)? " CONT
 if [[ $CONT =~ ^([Yy][Ee][Ss])$ ]]
 then
@@ -11,31 +14,31 @@ else
 fi
 
 branchName=`git rev-parse --abbrev-ref HEAD`
-if [ "$branchName" != "master" ]
+if [ "$branchName" != "$sourceBranch" ]
 then
 	echo "Error: You are currently on $branchName branch"
-	echo "       Please checkout master branch"
+	echo "       Please checkout $sourceBranch branch"
 	exit 1
 else
-	echo "Ok: You are on master branch"
+	echo "Ok: You are on $sourceBranch branch"
 fi
 
-echo "...Now pulling latest change on master branch.. wait..."
+echo "...Now pulling latest change on $sourceBranch branch.. wait..."
 git pull
 
 if [ -z "$(git status --porcelain)" ]; then 
-  	echo "Ok: Your master is clean"
+  	echo "Ok: Your $sourceBranch is clean"
 else 
-	echo "Error: You have uncommited change on master"
+	echo "Error: You have uncommited change on $sourceBranch"
 	echo "       Please stash them or reset them"
 	exit 1
 fi
 
 if [ -z "$(git status -sb | grep ahead)" ]; then
-	echo "Ok: Your master is sync with remote"
+	echo "Ok: Your $sourceBranch is sync with remote"
 else
-	echo "Error: Your local master is ahead of remote"
-	echo "       Please sync with remote master"
+	echo "Error: Your local $sourceBranch is ahead of remote"
+	echo "       Please sync with remote $sourceBranch"
 	exit 1
 fi
 
@@ -63,15 +66,15 @@ echo "Committing changes"
 git commit -m "auto: bump app version"
 git push origin
 
-echo "Merge master to release"
+echo "Merge $sourceBranch to $targetBranch"
 export GIT_MERGE_AUTOEDIT=no
 
-git checkout release
-git merge master
+git checkout $targetBranch
+git merge $sourceBranch
 git push
-git checkout master
+git checkout $sourceBranch
 
 echo "*************************************"
-echo "****** Done Upgraded from $version to $newVersion "
-echo "****** Merged Master to Releaes Build"
+echo "****** Done updating from $version to $newVersion "
+echo "****** Merged $sourceBranch to $targetBranch build"
 echo "*************************************"
