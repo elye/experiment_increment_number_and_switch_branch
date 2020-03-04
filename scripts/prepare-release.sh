@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+branchName=`git rev-parse --abbrev-ref HEAD`
+if [ "$branchName" != "master" ]
+then
+	echo "Error: You are currently on $branchName branch"
+	echo "       Please checkout master branch"
+	exit 1
+else
+	echo "Ok: You are on master branch"
+fi
+
+echo "...Now pulling latest change on master branch.. wait..."
+git pull
+
+if [ -z "$(git status --porcelain)" ]; then 
+  	echo "Ok: Your master is clean"
+else 
+	echo "Error: You have uncommited change on master"
+	echo "       Please stash them or reset them"
+	exit 1
+fi
+
+if [ ! -f ./version ]; then
+    echo "Version file not found!"
+	exit 1    
+fi
+
+echo "Doing something here"
