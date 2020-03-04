@@ -70,9 +70,9 @@ export GIT_MERGE_AUTOEDIT=no
 git checkout $targetBranch
 git merge $sourceBranch
 git push
+git checkout $currentBranchName
 git branch -D $targetBranch
 git branch -D $temporaryBranch
-git checkout $currentBranchName
 
 echo "*************************************"
 echo "****** Done updating from $version to $newVersion "
