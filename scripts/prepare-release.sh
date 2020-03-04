@@ -14,15 +14,7 @@ fi
 echo "...Now pulling latest change on master branch.. wait..."
 git pull
 
-if [ -z "$(git status --porcelain)" ]; then 
-  	echo "Ok: Your master is clean"
-else 
-	echo "Error: You have uncommited change on master"
-	echo "       Please stash them or reset them"
-	exit 1
-fi
-
-if [ -z "$(git status -sb | grep ahead)"]; then
+if [ -z "$(git status -sb | grep ahead)" ]; then
 	echo "Error: Your local master is ahead of remote"
 	echo "       Please sync with remote master"
 	exit 1
