@@ -27,4 +27,17 @@ if [ ! -f ./version ]; then
 	exit 1    
 fi
 
-echo "Doing something here"
+echo "Updating version number"
+
+versionFileName="./version"
+version=$(head -n 1 $versionFileName)
+echo "current version is $version"
+majorVersion=`cut -d'.' -f1 <<<$version`
+minorVersion=`cut -d'.' -f2 <<<$version`
+newMinorVersion=$(($minorVersion+1))
+newVersion=$majorVersion.$newMinorVersion
+echo "new version is $newVersion"
+echo $newVersion > $versionFileName
+echo "written new version to version file"
+
+
