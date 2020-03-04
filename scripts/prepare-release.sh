@@ -14,6 +14,15 @@ fi
 echo "...Now pulling latest change on master branch.. wait..."
 git pull
 
+
+if git diff-index --quiet HEAD --; then
+    echo "No Change************"
+    exit 1
+else
+    echo "Change************"
+    exit 1
+fi
+
 if [ -z "$(git status --porcelain)" ]; then 
   	echo "Ok: Your master is clean"
 else 
@@ -21,6 +30,7 @@ else
 	echo "       Please stash them or reset them"
 	exit 1
 fi
+
 
 if [ ! -f ./version ]; then
     echo "Version file not found!"
