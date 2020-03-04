@@ -39,7 +39,6 @@ fi
 echo "...Fetching latest update..."
 git fetch
 
-git branch -D $temporaryBranch
 git checkout -b $temporaryBranch
 git branch -D $sourceBranch
 git branch -D $targetBranch
