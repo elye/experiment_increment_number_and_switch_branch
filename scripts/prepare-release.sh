@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export MEME=0
+read -p "Ready for Android release process (YES/NO)? " CONT
+if [[ $CONT =~ ^([Yy][Ee][Ss])$ ]]
+then
+	Echo "Start Release Android Process"
+else
+	Echo "Type YES enter if you want to proceed"
+	exit 1
+fi
 
 branchName=`git rev-parse --abbrev-ref HEAD`
 if [ "$branchName" != "master" ]
