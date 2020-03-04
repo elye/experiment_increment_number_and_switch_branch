@@ -22,11 +22,15 @@ else
 	exit 1
 fi
 
-if [ ! -z "$(git status -sb | grep ahead)"]; then
+if [ -z "$(git status -sb | grep ahead)"]; then
 	echo "Error: Your local master is ahead of remote"
 	echo "       Please sync with remote master"
 	exit 1
-fi
+else
+	echo "Error: Your local master is not ahead"
+	echo "       Please sync with remote master"
+	exit 1
+fi	
 
 if [ ! -f ./version ]; then
     echo "Version file not found!"
