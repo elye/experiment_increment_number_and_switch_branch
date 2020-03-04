@@ -3,7 +3,14 @@ set -euo pipefail
 
 sourceBranch="master"
 targetBranch="release"
+temporaryBranch="temporaryBranchForReleaseProcess"
 
+echo "**********************************************************"
+echo "****** This is to start Android relese process "
+echo "****** Warning: Your $sourceBranch and $targetBranch will be rsync"
+echo "****** Make sure you don't have a different commit on them"
+echo "**********************************************************"
+echo ""
 read -p "Ready for Android release process (YES/NO)? " CONT
 if [[ $CONT =~ ^([Yy][Ee][Ss])$ ]]
 then
@@ -13,37 +20,28 @@ else
 	exit 1
 fi
 
-branchName=`git rev-parse --abbrev-ref HEAD`
-if [ "$branchName" != "$sourceBranch" ]
-then
-	echo "Error: You are currently on $branchName branch"
-	echo "       Please checkout $sourceBranch branch"
-	exit 1
-else
-	echo "Ok: You are on $sourceBranch branch"
-fi
+currentBranchName=`git rev-parse --abbrev-ref HEAD`
 
-echo "...Now pulling latest change on $sourceBranch branch.. wait..."
-git pull
 
 if [ -z "$(git status --porcelain)" ]; then 
-  	echo "Ok: Your $sourceBranch is clean"
+  	echo "Ok: Your $currentBranchName is commited"
+  	echo "    Safe to switch branch for our process"
 else 
-	echo "Error: You have uncommited change on $sourceBranch"
-	echo "       Please stash them or reset them"
+	echo "Error: You have uncommited change on $currentBranchName"
+	echo "       Please commit, stash or reset them before proceeding"
 	exit 1
 fi
 
-if [ -z "$(git status -sb | grep ahead)" ]; then
-	echo "Ok: Your $sourceBranch is sync with remote"
-else
-	echo "Error: Your local $sourceBranch is ahead of remote"
-	echo "       Please sync with remote $sourceBranch"
-	exit 1
-fi
+echo "...Fetching latest update..."
+git fetch
+
+git checkout -b $temporaryBranch
+git branch -D $sourceBranch
+git branch -D $targetBranch
+git checkout $sourceBranch
 
 if [ ! -f ./version ]; then
-    echo "Version file not found!"
+    echo "./version file not found! Please inform team"
 	exit 1    
 fi
 
@@ -72,7 +70,9 @@ export GIT_MERGE_AUTOEDIT=no
 git checkout $targetBranch
 git merge $sourceBranch
 git push
-git checkout $sourceBranch
+git branch -D $targetBranch
+git branch -D $temporaryBranch
+git checkout $currentBranchName
 
 echo "*************************************"
 echo "****** Done updating from $version to $newVersion "
