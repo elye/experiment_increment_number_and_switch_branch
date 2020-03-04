@@ -61,7 +61,6 @@ export GIT_MERGE_AUTOEDIT=no
 
 git checkout release
 git merge master
-git commit -a --allow-empty -m "merge develop for PlayStore release"
 git push
 git checkout master
 
