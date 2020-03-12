@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
 sourceBranch="master"
@@ -6,17 +6,17 @@ targetBranch="release"
 temporaryBranch="temporaryBranchForReleaseProcess"
 
 echo "**********************************************************"
-echo "****** This is to start Android release process "
-echo "****** Warning: Your $sourceBranch and $targetBranch will be resync"
+echo "****** This is to start iOS tagging release "
+echo "****** Warning: Your $targetBranch will be resync"
 echo "****** Make sure you don't have a different commit on them"
 echo "**********************************************************"
 echo ""
-read -p "Ready for Android release process (YES/NO)? " CONT
+read -p "Ready for Tagging iOS release (YES/NO)? " CONT
 if [[ $CONT =~ ^([Yy][Ee][Ss])$ ]]
 then
-	Echo "Start Release Android Process"
+	Echo "Start Tagging iOS Release"
 else
-	Echo "... Cancel Release Android Process ..."
+	Echo "... Cancel Tagging iOS Release ..."
 	Echo "(Type YES enter if you want to proceed)"
 	exit 1
 fi
@@ -42,51 +42,52 @@ git fetch
 
 git checkout -b $temporaryBranch
 
-if [ ! -z `git rev-parse --verify --quiet $sourceBranch` ]; then
-	git branch -D $sourceBranch
-fi
-
 if [ ! -z `git rev-parse --verify --quiet $targetBranch` ]; then
 	git branch -D $targetBranch
 fi
 
-git checkout $sourceBranch
+git checkout $targetBranch
 
-versionFileName="./version"
+
+versionFileName="./RcaApp/Configuration/Version.xcconfig"
 if [ ! -f $versionFileName ]; then
     echo "$versionFileName file not found! Please inform team"
 	exit 1    
 fi
 
-echo "Updating version number"
+echo "Tagging release with version number"
 
-version=$(head -n 1 $versionFileName)
+version=$(head -n 1 $versionFileName | awk {'print $3'})
 echo "current version is $version"
-majorVersion=`cut -d'.' -f1 <<<$version`
-minorVersion=`cut -d'.' -f2 <<<$version`
-newMinorVersion=$(($minorVersion+1))
-newVersion=$majorVersion.$newMinorVersion
-echo "new version is $newVersion"
-echo $newVersion > $versionFileName
-echo "written new version to version file"
+newTag="${version}"
 
-git add -A .
+if [ ! -z `git rev-parse --verify --quiet ${newTag}` ]; then
+  echo "Tag exists: remove ${newTag} it first";
+  git tag -d ${newTag}
+  git push --delete origin ${newTag}
+fi  
 
-echo "Committing changes"
-git commit -m "auto: bump app version"
-git push origin
+git tag ${newTag}
+git push origin ${newTag}
 
-echo "Merge $sourceBranch to $targetBranch"
-export GIT_MERGE_AUTOEDIT=no
-
-git checkout $targetBranch
-git merge $sourceBranch
-git push
 git checkout $currentBranchName
 git branch -D $targetBranch
 git branch -D $temporaryBranch
 
-echo "*************************************"
-echo "****** Done updating from $version to $newVersion "
-echo "****** Merged $sourceBranch to $targetBranch build"
-echo "*************************************"
+echo "********************************************"
+echo "****** Done tagging $version release branch "
+echo "********************************************"
+
+majorVersion=`cut -d'.' -f1 <<<$version`
+minorVersion=`cut -d'.' -f2 <<<$version`
+miniVersion=`cut -d'.' -f3 <<<$version`
+oldMiniVersion=$(($miniVersion-1))
+oldVersion=$majorVersion.$minorVersion.$oldMiniVersion
+echo "old version is $oldVersion"
+
+echo `pwd`
+sh ./scripts/release-notes-ios.sh $oldVersion $version | pbcopy
+
+echo "********************************************"
+echo "****** Done copy release notes on clipboard "
+echo "********************************************"
