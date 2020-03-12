@@ -42,7 +42,7 @@ git fetch
 
 git checkout -b $temporaryBranch
 
-if [ -z `git rev-parse --verify --quiet $sourceBranch` ]; then
+if [ ! -z `git rev-parse --verify --quiet $sourceBranch` ]; then
 	git branch -D $sourceBranch
 fi
 
