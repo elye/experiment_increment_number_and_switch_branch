@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -eo pipefail
 
 sourceBranch="master"
 targetBranch="release"
@@ -11,15 +11,19 @@ echo "****** Warning: Your $targetBranch will be resync"
 echo "****** Make sure you don't have a different commit on them"
 echo "**********************************************************"
 echo ""
-read -p "Ready for Tagging Android release (YES/NO)? " CONT
-if [[ $CONT =~ ^([Yy][Ee][Ss])$ ]]
+
+if [[ "$1" != "--noprompt" ]]
 then
-	Echo "Start Tagging Android Release"
-else
-	Echo "... Cancel Tagging Android Release ..."
-	Echo "(Type YES enter if you want to proceed)"
-	exit 1
-fi
+	read -p "Ready for Tagging Android release (YES/NO)? " CONT
+	if [[ $CONT =~ ^([Yy][Ee][Ss])$ ]]
+	then
+		Echo "Start Tagging Android Release"
+	else
+		Echo "... Cancel Tagging Android Release ..."
+		Echo "(Type YES enter if you want to proceed)"
+		exit 1
+	fi
+fi	
 
 if [ ! -z `git rev-parse --verify --quiet $temporaryBranch` ]; then
 	echo "Oops, you have $temporaryBranch. Please remove it"
@@ -83,7 +87,6 @@ oldMinorVersion=$(($minorVersion-1))
 oldVersion=$majorVersion.$oldMinorVersion
 echo "older version is $oldVersion"
 
-echo `pwd`
 sh ./scripts/release-notes.sh $oldVersion $version | pbcopy
 
 echo "********************************************"

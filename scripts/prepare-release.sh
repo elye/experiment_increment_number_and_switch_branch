@@ -90,3 +90,6 @@ echo "*************************************"
 echo "****** Done updating from $version to $newVersion "
 echo "****** Merged $sourceBranch to $targetBranch build"
 echo "*************************************"
+
+sh ./scripts/tag-release.sh --noprompt
+
