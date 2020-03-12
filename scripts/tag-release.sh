@@ -11,12 +11,12 @@ echo "****** Warning: Your $targetBranch will be resync"
 echo "****** Make sure you don't have a different commit on them"
 echo "**********************************************************"
 echo ""
-read -p "Ready for Android release process (YES/NO)? " CONT
+read -p "Ready for Tagging Android release (YES/NO)? " CONT
 if [[ $CONT =~ ^([Yy][Ee][Ss])$ ]]
 then
-	Echo "Start Release Android Process"
+	Echo "Start Tagging Android Release"
 else
-	Echo "... Cancel Release Android Process ..."
+	Echo "... Cancel Tagging Android Release ..."
 	Echo "(Type YES enter if you want to proceed)"
 	exit 1
 fi
@@ -59,6 +59,13 @@ echo "Tagging release with version number"
 version=$(head -n 1 $versionFileName)
 echo "current version is $version"
 newTag="${version}"
+
+if [ ! -z `git rev-parse --verify --quiet ${newTag}` ]; then
+  echo "Tag exists: remove ${newTag} it first";
+  git tag -d ${newTag}
+  git push --delete origin ${newTag}
+fi  
+
 git tag ${newTag}
 git push origin ${newTag}
 
