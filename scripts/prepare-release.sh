@@ -6,7 +6,7 @@ targetBranch="release"
 temporaryBranch="temporaryBranchForReleaseProcess"
 
 echo "**********************************************************"
-echo "****** This is to start Android relese process "
+echo "****** This is to start Android release process "
 echo "****** Warning: Your $sourceBranch and $targetBranch will be resync"
 echo "****** Make sure you don't have a different commit on them"
 echo "**********************************************************"
@@ -16,12 +16,13 @@ if [[ $CONT =~ ^([Yy][Ee][Ss])$ ]]
 then
 	Echo "Start Release Android Process"
 else
-	Echo "Type YES enter if you want to proceed"
+	Echo "... Cancel Release Android Process ..."
+	Echo "(Type YES enter if you want to proceed)"
 	exit 1
 fi
 
 if [ ! -z `git rev-parse --verify --quiet $temporaryBranch` ]; then
-	echo "Ops, you have $temporaryBranch. Please remove it"
+	echo "Oops, you have $temporaryBranch. Please remove it"
 	exit 1
 fi
 
@@ -51,14 +52,14 @@ fi
 
 git checkout $sourceBranch
 
-if [ ! -f ./version ]; then
-    echo "./version file not found! Please inform team"
+versionFileName="./version"
+if [ ! -f $versionFileName ]; then
+    echo "$versionFileName file not found! Please inform team"
 	exit 1    
 fi
 
 echo "Updating version number"
 
-versionFileName="./version"
 version=$(head -n 1 $versionFileName)
 echo "current version is $version"
 majorVersion=`cut -d'.' -f1 <<<$version`
